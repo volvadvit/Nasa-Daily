@@ -19,7 +19,7 @@ import retrofit2.http.Query
 class MainActivity : AppCompatActivity() {
 
     private val retrofitImpl: RetrofitImpl = RetrofitImpl()
-    //private final val KEY: String = "N5FP2Nt951oviCWEJktUX1dZtYPDnxdFD0O8drnR"
+    private final val KEY: String = "N5FP2Nt951oviCWEJktUX1dZtYPDnxdFD0O8drnR"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +28,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendServerRequest() {
-        retrofitImpl.getRequest().getNasaDaily("DEMO_KEY").enqueue(object  :
+        retrofitImpl.getRequest().getNasaDaily(KEY).enqueue(object  :
             Callback<DataModel> {
 
             override fun onResponse(
-                call: Call<DataModel>,
-                response: Response<DataModel>
+                    call: Call<DataModel>,
+                    response: Response<DataModel>
             ) {
                 if (response.isSuccessful && response.body() != null) {
                     renderData(response.body(), null)
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<DataModel>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<DataModel>, t: Throwable) {
                 renderData(null, t)
             }
         })
@@ -55,18 +55,20 @@ class MainActivity : AppCompatActivity() {
             val url = dataModel.url
             if (url.isNullOrEmpty()) {
                 Toast.makeText(this, "Ссылка на фото пусткая", Toast.LENGTH_LONG).show()
-            } else
+            } else {
                 if (url.contains("www.youtube.com")) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } else {
                     image_view.load(url)
+                    val explanation = dataModel.explanation
+                    if (explanation.isNullOrEmpty()) {
+                        Toast.makeText(this, "Описание пустое", Toast.LENGTH_LONG).show()
+                    } else {
+                        text_view.text = explanation
+                    }
                 }
-            val explanation = dataModel.explanation
-            if (explanation.isNullOrEmpty()) {
-                Toast.makeText(this, "Описание пустое", Toast.LENGTH_LONG).show()
-            } else {
-                text_view.text = explanation
             }
+
         }
     }
 }
