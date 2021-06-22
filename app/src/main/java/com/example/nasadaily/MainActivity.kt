@@ -19,7 +19,10 @@ import retrofit2.http.Query
 class MainActivity : AppCompatActivity() {
 
     private val retrofitImpl: RetrofitImpl = RetrofitImpl()
-    private final val KEY: String = "N5FP2Nt951oviCWEJktUX1dZtYPDnxdFD0O8drnR"
+
+    companion object {
+        private const val KEY: String = "N5FP2Nt951oviCWEJktUX1dZtYPDnxdFD0O8drnR"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendServerRequest() {
-        retrofitImpl.getRequest().getNasaDaily(KEY).enqueue(object  :
+        retrofitImpl.getRequest().getNasaDaily(Companion.KEY).enqueue(object  :
             Callback<DataModel> {
 
             override fun onResponse(
@@ -54,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             val url = dataModel.url
             if (url.isNullOrEmpty()) {
-                Toast.makeText(this, "Ссылка на фото пусткая", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Photo url is empty", Toast.LENGTH_LONG).show()
             } else {
                 if (url.contains("www.youtube.com")) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -62,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                     image_view.load(url)
                     val explanation = dataModel.explanation
                     if (explanation.isNullOrEmpty()) {
-                        Toast.makeText(this, "Описание пустое", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Empty description", Toast.LENGTH_LONG).show()
                     } else {
                         text_view.text = explanation
                     }
@@ -79,13 +82,11 @@ data class DataModel (
 )
 
 interface NasaDailyAPI {
-
     @GET("planetary/apod")
     fun getNasaDaily(@Query("api_key") apiKey: String): Call<DataModel>
 }
 
 class RetrofitImpl {
-
     fun getRequest(): NasaDailyAPI {
         val podRetrofit = Retrofit.Builder()
             .baseUrl("https://api.nasa.gov/")
